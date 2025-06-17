@@ -34,7 +34,7 @@ enum Choice1 {
 };
 
 enum Choice2 {
-    ADD_PASSWORD = 1,
+    ADD_PASSWORD = 1, // snake case 
     WRITEOUT_PASSWORDS,
     DELETE_PASSWORD,
     CHANGE_PASSWORD,
