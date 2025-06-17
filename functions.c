@@ -1,4 +1,4 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,7 +10,7 @@ USER user;
 static PASS* array_of_passwords = NULL;
 int number_of_pass = 0;
 
-// 10, 11
+
 void createfile(const char* const filename) {
     FILE* file = fopen(filename, "w");
     if (file == NULL) {
@@ -29,66 +29,74 @@ void create_users_file(const char* const file_users) {
     fclose(file);
 }
 
-void new_user(int* const num_users, USER* users, const char* const file_users) {
-    if (*num_users >= MAX_USERS) {
-        printf("Dosegnut je maksimalni broj korisnika.\n");
-        return;
-    }
+void new_user(int* const num_users, USER* users, const char* const file_users) {  
+    if (*num_users >= MAX_USERS) {  
+        printf("Dosegnut je maksimalni broj korisnika.\n");  
+        return;  
+    }  
 
-    char new_username[MAX_NAME_LENGTH];
-    int i;
+    char new_username[MAX_NAME_LENGTH];  
+    int i;  
 
-    do {
-        printf("Unesite korisničko ime (bez razmaka): ");
-        scanf(" %49[^\n]", new_username);
-        while (getchar() != '\n');
-        if (strchr(new_username, ' ') != NULL || !is_alpha_string(new_username)) {
-            printf("Neispravno korisničko ime. Pokušajte ponovno.\n");
-        }
-        else {
-            break;
-        }
-    } while (1);
+    do {  
+        printf("Unesite korisničko ime (bez razmaka): ");  
+        scanf(" %49[^\n]", new_username);  
+        while (getchar() != '\n');  
+        if (strchr(new_username, ' ') != NULL || !is_alpha_string(new_username)) {  
+            printf("Neispravno korisničko ime. Pokušajte ponovno.\n");  
+        }  
+        else {  
+            break;  
+        }  
+    } while (1);  
 
-    for (i = 0; i < *num_users; i++) {
-        if (strcmp(new_username, users[i].name) == 0) {
-            printf("Korisnik već postoji.\n");
-            return;
-        }
-    }
+    for (i = 0; i < *num_users; i++) {  
+        if (strcmp(new_username, users[i].name) == 0) {  
+            printf("Korisnik već postoji.\n");  
+            return;  
+        }  
+    }  
 
-    users[*num_users].name = _strdup(new_username);
-    users[*num_users].password = malloc(MAX_PASS_LENGTH);
-    memset(users[*num_users].password, 0, MAX_PASS_LENGTH);
+    users[*num_users].name = _strdup(new_username);  
+    users[*num_users].password = (char*)malloc(MAX_PASS_LENGTH); // allocrianje memorije
+    if (users[*num_users].password == NULL) {  
+        perror("Greška pri alokaciji memorije za lozinku");  
+        exit(EXIT_FAILURE);  
+    }  
+    memset(users[*num_users].password, 0, MAX_PASS_LENGTH); // inicijalizacija lozinke
 
-    do {
-        printf("Unesite lozinku (bez razmaka): ");
-        scanf(" %29[^\n]", users[*num_users].password);
-        while (getchar() != '\n');
+    do {  
+        printf("Unesite lozinku (bez razmaka): ");  
+        scanf(" %29[^\n]", users[*num_users].password);  
+        while (getchar() != '\n');  
 
-        if (strchr(users[*num_users].password, ' ') != NULL || !validatePlaintext(users[*num_users].password)) {
-            printf("Neispravna lozinka. Pokušajte ponovno.\n");
-        }
-        else {
-            break;
-        }
-    } while (1);
+        if (strchr(users[*num_users].password, ' ') != NULL || !validatePlaintext(users[*num_users].password)) {  
+            printf("Neispravna lozinka. Pokušajte ponovno.\n");  
+        }  
+        else {  
+            break;  
+        }  
+    } while (1);  
 
-    users[*num_users].num_passwords = 0;
-    encryptXOR(users[*num_users].password);
+    users[*num_users].num_passwords = 0;  
+    encryptXOR(users[*num_users].password);  
 
-    FILE* file = fopen(file_users, "a");
-    fprintf(file, "%s %s\n", users[*num_users].name, users[*num_users].password);
-    fclose(file);
+    FILE* file = fopen(file_users, "a");  
+    if (file == NULL) {  
+        perror("Greška pri otvaranju datoteke korisnika");  
+        exit(EXIT_FAILURE);  
+    }  
+    fprintf(file, "%s %s\n", users[*num_users].name, users[*num_users].password);  
+    fclose(file);  
 
-    (*num_users)++;
-    printf("Korisnik uspješno dodan.\n");
+    (*num_users)++;  
+    printf("Korisnik uspješno dodan.\n");  
 }
 
 USER* load_users(const char* file_users, int* num_users) {
     FILE* file = fopen(file_users, "r");
-    if (!file) {
-        perror("Greška pri otvaranju datoteke korisnika");
+    if (!file) { // provjera da li je datoteka otvorena
+        perror("Greška pri otvaranju datoteke korisnika"); // ispis greške
         exit(EXIT_FAILURE);
     }
 
@@ -135,14 +143,14 @@ void login_user(int* const num_users, USER* users) {
                 getchar();
 
                 switch (izbor) {
-                case 1: add_password(filename, &users[i]); break;
-                case 2: writeout_passwords(filename, &users[i]); break;
-                case 3: delete_password(filename, &users[i]); break;
-                case 4: change_password(filename, &users[i]); break;
-                case 5: search_password(filename); break;
-                case 6: abc_print(filename, &users[i]); break;
-                case 7: printf("Odjavljeni ste.\n"); return;
-                default: printf("Neispravan odabir.\n");
+                case 1: add_password(filename, &users[i]); break; // [1. CRUID] - add_password: CREATE – Dodaje novu lozinku i zapisuje je u datoteku.
+				case 2: writeout_passwords(filename, &users[i]); break; // [2. CRUID] - writeout_passwords: READ – Ispisuje sve lozinke korisnika iz datoteke.
+				case 3: delete_password(filename, &users[i]); break; // [3. CRUID] - delete_password: DELETE – Briše lozinku iz datoteke.
+                case 4: change_password(filename, &users[i]); break; // [4. CRUID] - change_password: UPDATE – Promijeni lozinku.
+                case 5: search_password(filename); break; // [5. CRUID] - search_password: READ – Pretrazuje lozinke po nazivu.
+                case 6: abc_print(filename, &users[i]); break; // [6. CRUID] - abc_print: READ – Ispisuje sve lozinke po abecedi.
+				case 7: printf("Odjavljeni ste.\n"); return; // [7. CRUID] - exit: EXIT – Izlazi iz aplikacije.
+                default: printf("Neispravan odabir.\n"); 
                 }
             }
         }
