@@ -6,20 +6,21 @@
 #include "header.h"   
 #include <stdbool.h>  // za bool tip podataka jasno pokazuje da varijabla predstavlja logičku vrijednost – true ili false, a ne neki slučajni broj
 
-
+// Zamjenjuje razmake u stringu podvlakama (za spremanje u datoteku)
 void replace_spaces_with_underscores(char* str) {
     for (int i = 0; str[i] != '\0'; i++) {
         if (str[i] == ' ') str[i] = '_';
     }
 }
 
+// Zamjenjuje podvlake natrag u razmake (za ispis korisniku)
 void replace_underscores_with_spaces(char* str) {
     for (int i = 0; str[i] != '\0'; i++) {
         if (str[i] == '_') str[i] = ' ';
     }
 }
 
-
+// Dodaje novu lozinku korisniku – provjerava duplikate, validira unos, enkriptira i sprema
 void add_password(const char* filename, USER* user) {
     if (user->num_passwords >= MAX_PASSWORDS) {
         printf("Dosegnut je maksimalan broj spremljenih lozinki.\n");
@@ -68,6 +69,7 @@ void add_password(const char* filename, USER* user) {
     user->num_passwords++;
 }
 
+// Ispisuje sve spremljene lozinke iz datoteke (dekriptirane za prikaz)
 void writeout_passwords(const char* filename, const USER* user) {
     FILE* file = fopen(filename, "r");
     if (!file) {
@@ -75,7 +77,6 @@ void writeout_passwords(const char* filename, const USER* user) {
         return;
     }
 
-    
     long pozicija = ftell(file);
     printf("[INFO] Trenutna pozicija u datoteci: %ld bajtova od početka.\n", pozicija);
 
@@ -88,15 +89,13 @@ void writeout_passwords(const char* filename, const USER* user) {
         printf("Za: %s | Lozinka: %s\n", pass.name_of_use, pass.password_stored);
     }
 
-    // Reset pozicije čitača na početak datoteke
-    rewind(file);
+    rewind(file); // vraćanje na početak datoteke (nije obavezno ali korisno za debug info)
     printf("[INFO] Nakon rewind(), vraćeni smo na početak datoteke.\n");
 
     fclose(file);
 }
 
-
-
+// Briše lozinku po nazivu – pita korisnika za potvrdu, koristi privremenu datoteku
 void delete_password(const char* filename, USER* user) {
     char usage[MAX_NAME_LENGTH];
     printf("Unesite naziv lozinke koju želite izbrisati: ");
@@ -144,6 +143,7 @@ void delete_password(const char* filename, USER* user) {
     else printf("Lozinka nije pronađena.\n");
 }
 
+// Mijenja postojeću lozinku – traži unos nove i sprema enkriptiranu vrijednost
 void change_password(const char* filename, USER* user) {
     char usage[MAX_NAME_LENGTH];
     printf("Unesite naziv lozinke za promjenu: ");
@@ -195,6 +195,7 @@ void change_password(const char* filename, USER* user) {
     else printf("Lozinka nije pronađena.\n");
 }
 
+// Traži lozinku po imenu i prikazuje dekriptiranu ako postoji
 void search_password(const char* filename) {
     char name[MAX_NAME_LENGTH];
     printf("Unesite naziv lozinke za pretragu: ");
@@ -224,21 +225,25 @@ void search_password(const char* filename) {
     fclose(file);
 }
 
+// Enkriptira lozinku pomoću XOR algoritma
 void encryptXOR(char* password) {
     for (int i = 0; password[i] != '\0'; i++) {
-        password[i] ^= XOR_KEY; // SCREAMING_SNAKE_CASE za XOR_KEY sprema se u header.h
+        password[i] ^= XOR_KEY; // XOR enkripcija sa statičkim ključem
     }
 }
 
+// Dekriptira lozinku – zapravo isti algoritam kao i enkripcija
 void decryptXOR(char* password) {
-    encryptXOR(password); // XOR dešifriranje isto kao šifriranje 
+    encryptXOR(password); // XOR je reverzibilan – isto funkcija radi i obrnuto
 }
 
+// Provjerava je li znak dozvoljen u lozinki
 bool is_allowed(char c) {
     const char* allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 !#$%&/()=?*'";
     return strchr(allowedChars, c) != NULL;
 }
 
+// Provjerava je li cijeli string ispravan (sadrži samo dozvoljene znakove)
 bool validatePlaintext(const char* plaintext) {
     for (int i = 0; plaintext[i] != '\0'; i++) {
         if (!is_allowed(plaintext[i])) return false;
@@ -246,13 +251,15 @@ bool validatePlaintext(const char* plaintext) {
     return true;
 }
 
+// Funkcija za usporedbu imena lozinki (za sortiranje)
 int compare_names(const void* a, const void* b) {
     const PASS* pa = (const PASS*)a;
     const PASS* pb = (const PASS*)b;
     return strcmp(pa->name_of_use, pb->name_of_use);
 }
 
-void abc_print(const char* filename, USER* user) { // Funkcija za abecedni ispis lozinki
+// Sortira i ispisuje sve lozinke po abecednom redu
+void abc_print(const char* filename, USER* user) {
     FILE* file = fopen(filename, "r");
     if (!file) {
         perror("Greška pri otvaranju datoteke");
@@ -269,9 +276,7 @@ void abc_print(const char* filename, USER* user) { // Funkcija za abecedni ispis
     }
     fclose(file);
 
-                                                     // qsort koristi pokazivač na funkciju 'compare_names' za sortiranje
-    qsort(temp, count, sizeof(PASS), compare_names); // sortiranje po imenu lozinke po abecedi (ASCII)
-                                                     // qsort nije direktno korištenje rekurzije, ali je rekurzivna funkcija jer poziva samu sebe kako bi riješila problem sortiranja
+    qsort(temp, count, sizeof(PASS), compare_names); // Sortira po imenu (abecedno)
 
     for (int i = 0; i < count; i++) {
         printf("Za: %s | Lozinka: %s\n", temp[i].name_of_use, temp[i].password_stored);
