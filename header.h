@@ -43,27 +43,28 @@ enum Choice2 {
     LOG_OUT
 };
 
-void createfile(const char* const filename);
-void create_users_file(const char* const file_users);
-void new_user(int* const num_users, USER* users, const char* const file_users);
-void login_user(int* const num_users, USER* users);
-void delete_user(int* const num_users, USER* users);
-void display_users(int* const num_users, USER* users);
-void exit_manager(int* const num_users, USER* users);
-void add_password(const char* filename, USER* user);
-PASS* update_password(const char* const filename, int* p_number_of_pass);
-void writeout_passwords(const char* filename, const USER* user);
-void delete_password(const char* filename, USER* user);
-void replace_spaces_with_underscores(char* str);
-void replace_underscores_with_spaces(char* str);
-void decryptXOR(char* password);
-void encryptXOR(char* password);
-void search_password(const char* filename);
-bool validatePlaintext(const char* plaintext);
-bool is_allowed(char c);
-void abc_print(const char* filename, USER* user);
-USER* load_users(const char* file_users, int* num_users);
-void free_users(int* const num_users, USER* users);
-int count_lines_in_file(const char* filename);
-void change_password(const char* filename, USER* user);
-static inline bool is_alpha_string(const char* str);
+// Deklaracije funkcija:
+void createfile(const char* const filename); // Stvara praznu datoteku ako ne postoji
+void create_users_file(const char* const file_users); // Inicijalizira datoteku s korisnicima
+void new_user(int* const num_users, USER* users, const char* const file_users); // Dodaje novog korisnika
+void login_user(int* const num_users, USER* users); // Prijava korisnika
+void delete_user(int* const num_users, USER* users); // Brisanje korisnika
+void display_users(int* const num_users, USER* users); // Prikaz svih korisnika
+void exit_manager(int* const num_users, USER* users); // Izlaz i čišćenje memorije
+void add_password(const char* filename, USER* user); // Dodavanje nove lozinke korisniku
+PASS* update_password(const char* const filename, int* p_number_of_pass); // Učitavanje lozinki iz datoteke
+void writeout_passwords(const char* filename, const USER* user); // Ispis svih lozinki
+void delete_password(const char* filename, USER* user); // Brisanje određene lozinke
+void replace_spaces_with_underscores(char* str); // Zamjena razmaka s podvlakama u stringu
+void replace_underscores_with_spaces(char* str); // Zamjena podvlaka s razmacima
+void decryptXOR(char* password); // Dekriptiranje lozinke pomoću XOR
+void encryptXOR(char* password); // Enkriptiranje lozinke pomoću XOR
+void search_password(const char* filename); // Pretraživanje lozinke po imenu
+bool validatePlaintext(const char* plaintext); // Provjera valjanosti običnog teksta
+bool is_allowed(char c); // Provjera je li znak dozvoljen
+void abc_print(const char* filename, USER* user); // Ispis lozinki abecednim redom
+USER* load_users(const char* file_users, int* num_users); // Učitavanje korisnika iz datoteke
+void free_users(int* const num_users, USER* users); // Oslobađanje zauzete memorije korisnika
+int count_lines_in_file(const char* filename); // Broji redove u datoteci
+void change_password(const char* filename, USER* user); // Promjena lozinke
+static inline bool is_alpha_string(const char* str); // Provjerava je li string sastavljen samo od slova
